@@ -999,6 +999,10 @@ public class JobMeta extends AbstractMeta implements Cloneable, Comparable<JobMe
         // //
       }
 
+      // Load the database connections, slave servers, cluster schemas & partition schemas into this object.
+      //
+      importFromMetaStore();      
+      
       // Read the named parameters.
       Node paramsNode = XMLHandler.getSubNode( jobnode, XML_TAG_PARAMETERS );
       int nrParams = XMLHandler.countNodes( paramsNode, "parameter" );
@@ -1038,7 +1042,7 @@ public class JobMeta extends AbstractMeta implements Cloneable, Comparable<JobMe
           }
         }
       }
-
+      
       // Read the slave servers...
       //
       Node slaveServersNode = XMLHandler.getSubNode( jobnode, XML_TAG_SLAVESERVERS );

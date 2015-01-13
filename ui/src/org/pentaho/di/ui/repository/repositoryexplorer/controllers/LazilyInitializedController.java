@@ -61,6 +61,7 @@ public abstract class LazilyInitializedController extends AbstractXulEventHandle
   }
 
   private void showErrorDialog( final Exception e ) {
+    Thread.dumpStack();
     XulMessageBox messageBox = null;
     try {
       messageBox = (XulMessageBox) document.createElement( "messagebox" );
