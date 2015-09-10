@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.pentaho.di.core.exception.KettleException;
+import org.pentaho.di.i18n.BaseMessages;
 import org.pentaho.di.repository.IUser;
 import org.pentaho.di.repository.ObjectId;
 import org.pentaho.di.repository.pur.model.EERoleInfo;
@@ -102,7 +103,13 @@ public class PurRepositorySecurityManager implements IRoleSupportSecurityManager
 	}
 
 	public void saveUserInfo(IUser user) throws KettleException {
-		userRoleDelegate.createUser(user);
+        user.setLogin(user.getLogin().trim());
+        user.setName(user.getName().trim());
+        if(user.getLogin().isEmpty() || user.getName().isEmpty()){
+            throw new KettleException(BaseMessages.getString(PurRepositorySecurityManager.class, 
+                    "PurRepositorySecurityManager.ERROR_0001_UNABLE_TO_CREATE_USER_IS_EMPTY"));
+        }
+        userRoleDelegate.createUser(user);
 	}
 
 	public void createRole(IRole newRole) throws KettleException {
