@@ -995,11 +995,13 @@ public class JobEntryJob extends JobEntryBase implements Cloneable, JobEntryInte
 
         }
 
-        if ( iteration == 0 ) {
-          result.clear();
-        }
-
+        result.clear(); // clear only the numbers, NOT the files or rows.
         result.add( oneResult );
+
+        // Set the result rows too, if any ...
+        if ( !Const.isEmpty( oneResult.getRows() ) ) {
+          result.setRows( new ArrayList<RowMetaAndData>( oneResult.getRows() ) );
+        }
 
         // if one of them fails (in the loop), increase the number of errors
         //
@@ -1184,7 +1186,7 @@ public class JobEntryJob extends JobEntryBase implements Cloneable, JobEntryInte
     if ( rep != null ) {
       return getJobMeta( rep, rep.getMetaStore(), space );
     } else {
-      return getJobMeta( rep, null, space );
+      return getJobMeta( rep, getMetaStore(), space );
     }
   }
 
@@ -1194,8 +1196,8 @@ public class JobEntryJob extends JobEntryBase implements Cloneable, JobEntryInte
       switch ( specificationMethod ) {
         case FILENAME:
           jobMeta =
-            new JobMeta(
-              ( space != null ? space.environmentSubstitute( getFilename() ) : getFilename() ), rep, null );
+            new JobMeta( space, ( space != null ? space.environmentSubstitute( getFilename() ) : getFilename() ),
+              rep, metaStore, null );
           break;
         case REPOSITORY_BY_NAME:
           if ( rep != null ) {

@@ -214,6 +214,36 @@
   </target>
 
   <!--=======================================================================
+        Support pentaho-standard CI subfloor build targets
+
+      ====================================================================-->
+  <target name="build-sonar" depends="install-antcontrib,subfloor.clean">
+    <antcall target="call-for-all">
+      <param name="target.name" value="subfloor.build-sonar"/>
+    </antcall>
+  </target>
+
+  <target name="continuous-sonar" depends="install-antcontrib,subfloor.clean">
+    <antcall target="call-for-all">
+      <param name="target.name" value="continuous-sonar"/>
+    </antcall>
+  </target>
+
+  <target name="build-testless" depends="install-antcontrib,subfloor.clean">
+    <antcall target="call-for-all">
+      <param name="target.name" value="subfloor.build-testless"/>
+    </antcall>
+  </target>
+
+  <target name="continuous-testless" depends="install-antcontrib,subfloor.clean">
+    <antcall target="call-for-all">
+      <param name="target.name" value="continuous-testless"/>
+    </antcall>
+  </target>
+
+
+
+  <!--=======================================================================
         create-dot-classpath
 
         Creates the Eclipse .classpath file from the resolved
@@ -649,7 +679,7 @@
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.resource.ResourceDependencyTest" haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.resource.ResourceExportTest" haltonerror="false"/>
     </junit>
-  	
+
     <junitreport todir="${testreports.html.dir}">
       <fileset dir="${testreports.xml.dir}">
         <include name="TEST-*.xml"/>
@@ -686,7 +716,7 @@
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.NormalExecutionTest" haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.RowProducerTest" haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.TransSingleThreadTest" haltonerror="false"/>
-      <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.WordCountSingleThreadTest" haltonerror="false"/>
+      <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.WordCountSampleTest" haltonerror="false"/>
 
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.addsequence.AddSequenceTest"
             haltonerror="false"/>
@@ -731,6 +761,7 @@
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.insertupdate.InsertUpdateTest"
             haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.janino.JaninoStepTest" haltonerror="false"/>
+      <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.javafilter.JavaFilterTest" haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.jsonoutput.JsonOutputTest"
             haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.mailvalidator.MailValidationTest"
@@ -743,6 +774,8 @@
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.numberrange.NumberRangeRuleTest"
             haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.numberrange.NumberRangeSetTest"
+            haltonerror="false"/>
+      <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.pentahoreporting.PentahoReportingOutputTest"
             haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.regexeval.RegexEvalTest"
             haltonerror="false"/>
@@ -760,6 +793,8 @@
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.textfileinput.TextFileInputTests"
             haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.textfileoutput.TextFileOutputTests"
+            haltonerror="false"/>
+      <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.textfileoutput.TextFileOutputSplittingTest"
             haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.unique.UniqueRowsTest" haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.update.UpdateTest" haltonerror="false"/>
@@ -804,6 +839,8 @@
 
       <formatter type="xml"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.job.JobTrackerExecutionTest" haltonerror="false"/>
+      <test todir="${testreports.xml.dir}" name="org.pentaho.di.job.SimultaneousJobsAppenderTest" haltonerror="false"/>
+      <test todir="${testreports.xml.dir}" name="org.pentaho.di.job.SimpleEvalNullFieldTest" haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.tablecompare.TableCompareTest" haltonerror="false" />
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.blackbox.BlackBoxTests" haltonerror="false" />
     </junit>
@@ -842,7 +879,12 @@
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.cluster.MasterSlaveTest" haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.cluster.PartitioningTest" haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.cluster.SlaveSequenceTest" haltonerror="false"/>
+      <test todir="${testreports.xml.dir}" name="org.pentaho.di.trans.steps.concatfields.ConcatFields_PDI_10856_Test" haltonerror="false"/>
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.www.CarteTest" haltonerror="false"/>
+      <test todir="${testreports.xml.dir}" name="org.pentaho.di.job.entries.sftp.SFTPClientTest" haltonerror="false"/>
+      <test todir="${testreports.xml.dir}" name="org.pentaho.di.job.entries.sftp.JobEntrySFTPTest" haltonerror="false"/>
+      <test todir="${testreports.xml.dir}" name="org.pentaho.di.job.entries.ftpsget.FTPSConnectionTest" haltonerror="false"/>
+      <test todir="${testreports.xml.dir}" name="org.pentaho.di.job.entries.ftpsget.JobEntryFTPSGetTest" haltonerror="false"/>
 
       <!-- Some extra things to run -->
       <test todir="${testreports.xml.dir}" name="org.pentaho.di.job.entries.copyfiles.CopyFilesTest"

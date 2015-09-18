@@ -2,7 +2,7 @@
  *
  * Pentaho Data Integration
  *
- * Copyright (C) 2002-2013 by Pentaho : http://www.pentaho.com
+ * Copyright (C) 2002-2015 by Pentaho : http://www.pentaho.com
  *
  *******************************************************************************
  *
@@ -38,6 +38,8 @@ import org.pentaho.di.core.Const;
 import org.pentaho.di.core.database.DatabaseMeta;
 import org.pentaho.di.core.dnd.DragAndDropContainer;
 import org.pentaho.di.core.dnd.XMLTransfer;
+import org.pentaho.di.core.extension.ExtensionPointHandler;
+import org.pentaho.di.core.extension.KettleExtensionPoint;
 import org.pentaho.di.core.plugins.JobEntryPluginType;
 import org.pentaho.di.core.plugins.PluginInterface;
 import org.pentaho.di.core.plugins.PluginRegistry;
@@ -125,6 +127,7 @@ public class SpoonTreeDelegate extends SpoonDelegate {
               if ( path[2].equals( Spoon.STRING_CLUSTERS ) ) {
                 object = new TreeSelection( path[2], ClusterSchema.class, transMeta );
               }
+              executeExtensionPoint( new SpoonTreeDelegateExtension( transMeta, path, 3, objects ) );
             }
             if ( path[0].equals( Spoon.STRING_JOBS ) ) { // Jobs title
 
@@ -138,6 +141,7 @@ public class SpoonTreeDelegate extends SpoonDelegate {
               if ( path[2].equals( Spoon.STRING_SLAVES ) ) {
                 object = new TreeSelection( path[2], SlaveServer.class, jobMeta );
               }
+              executeExtensionPoint( new SpoonTreeDelegateExtension( jobMeta, path, 3, objects ) );
             }
             break;
 
@@ -170,6 +174,7 @@ public class SpoonTreeDelegate extends SpoonDelegate {
                 if ( path[2].equals( Spoon.STRING_CLUSTERS ) ) {
                   object = new TreeSelection( path[3], transMeta.findClusterSchema( path[3] ), transMeta );
                 }
+                executeExtensionPoint( new SpoonTreeDelegateExtension( transMeta, path, 4, objects ) );
               }
             }
             if ( path[0].equals( Spoon.STRING_JOBS ) ) { // The name of a job
@@ -189,6 +194,7 @@ public class SpoonTreeDelegate extends SpoonDelegate {
               if ( jobMeta != null && path[2].equals( Spoon.STRING_SLAVES ) ) {
                 object = new TreeSelection( path[3], jobMeta.findSlaveServer( path[3] ), jobMeta );
               }
+              executeExtensionPoint( new SpoonTreeDelegateExtension( jobMeta, path, 4, objects ) );
             }
             break;
 
@@ -355,6 +361,15 @@ public class SpoonTreeDelegate extends SpoonDelegate {
       }
     } );
 
+  }
+
+  private void executeExtensionPoint( SpoonTreeDelegateExtension extension ) {
+    try {
+      ExtensionPointHandler
+          .callExtensionPoint( log, KettleExtensionPoint.SpoonTreeDelegateExtension.id, extension );
+    } catch ( Exception e ) {
+      log.logError( "Error handling SpoonTreeDelegate through extension point", e );
+    }
   }
 
 }

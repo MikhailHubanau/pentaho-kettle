@@ -1,8 +1,32 @@
+/*! ******************************************************************************
+ *
+ * Pentaho Data Integration
+ *
+ * Copyright (C) 2002-2015 by Pentaho : http://www.pentaho.com
+ *
+ *******************************************************************************
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************/
+
 package org.pentaho.di.core.row;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -76,7 +100,19 @@ public class RowMetaTest {
     assertEquals( 1, rowMeta.indexOfValue( "bravo" ) );
   }
 
-  @Test(expected=UnsupportedOperationException.class)
+  @Test
+  public void testSetValueMetaListNullName() throws KettlePluginException {
+    List<ValueMetaInterface> setList = this.generateVList( new String[] { "alpha", null }, new int[] { 2, 2 } );
+    rowMeta.setValueMetaList( setList );
+    assertTrue( setList.contains( rowMeta.searchValueMeta( "alpha" ) ) );
+    assertFalse( setList.contains( rowMeta.searchValueMeta( null ) ) );
+
+    // check that it is avalable by index:
+    assertEquals( 0, rowMeta.indexOfValue( "alpha" ) );
+    assertEquals( -1, rowMeta.indexOfValue( null ) );
+  }
+
+  @Test( expected = UnsupportedOperationException.class )
   public void testDeSynchronizationModifyingOriginalList() {
     // remember 0-based arrays
     int size = rowMeta.size();
@@ -96,6 +132,13 @@ public class RowMetaTest {
   public void testAddValueMetaValueMetaInterface() throws KettlePluginException {
     rowMeta.addValueMeta( charly );
     assertTrue( rowMeta.getValueMetaList().contains( charly ) );
+  }
+
+  @Test
+  public void testAddValueMetaNullName() throws KettlePluginException {
+    ValueMetaInterface vmi = new ValueMeta();
+    rowMeta.addValueMeta( vmi );
+    assertTrue( rowMeta.getValueMetaList().contains( vmi ) );
   }
 
   @Test
@@ -119,11 +162,24 @@ public class RowMetaTest {
   }
 
   @Test
+  public void testSetValueMetaNullName() throws KettlePluginException {
+    ValueMetaInterface vmi = new ValueMeta();
+    rowMeta.setValueMeta( 1, vmi );
+    assertEquals( 1, rowMeta.getValueMetaList().indexOf( vmi ) );
+    assertEquals( "There is still 3 elements:", 3, rowMeta.size() );
+  }
+
+  @Test
   public void testIndexOfValue() {
     List<ValueMetaInterface> list = rowMeta.getValueMetaList();
     assertEquals( 0, list.indexOf( string ) );
     assertEquals( 1, list.indexOf( integer ) );
     assertEquals( 2, list.indexOf( date ) );
+  }
+
+  @Test
+  public void testIndexOfNullValue() {
+    assertEquals( -1, rowMeta.indexOfValue( null ) );
   }
 
   @Test
@@ -210,12 +266,19 @@ public class RowMetaTest {
   public void testExternalValueMetaModification() {
     ValueMetaInterface vmi = rowMeta.searchValueMeta( "string" );
     vmi.setName( "string2" );
-    // index become corrupted!
-    assertNull( rowMeta.searchValueMeta( vmi.getName() ) );
-    // a hack
-    rowMeta.setValueMetaList( rowMeta.getValueMetaList() );
-    // and now it can be found again
     assertNotNull( rowMeta.searchValueMeta( vmi.getName() ) );
+  }
+
+  @Test
+  public void testSwapNames() throws KettlePluginException {
+    ValueMetaInterface string2 = ValueMetaFactory.createValueMeta( "string2", ValueMeta.TYPE_STRING );
+    rowMeta.addValueMeta( string2 );
+    assertSame( string, rowMeta.searchValueMeta( "string" ) );
+    assertSame( string2, rowMeta.searchValueMeta( "string2" ) );
+    string.setName( "string2" );
+    string2.setName( "string" );
+    assertSame( string2, rowMeta.searchValueMeta( "string" ) );
+    assertSame( string, rowMeta.searchValueMeta( "string2" ) );
   }
 
   // @Test

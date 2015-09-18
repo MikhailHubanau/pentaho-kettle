@@ -26,9 +26,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +34,9 @@ import org.mortbay.jetty.bio.SocketConnector;
 import org.pentaho.di.cluster.SlaveServer;
 import org.pentaho.di.core.Const;
 import org.pentaho.di.core.logging.LogChannelInterface;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Tatsiana_Kasiankova

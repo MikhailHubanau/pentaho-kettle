@@ -21,6 +21,7 @@
  ******************************************************************************/
 package org.pentaho.di.www;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.Encoder;
@@ -45,6 +46,10 @@ public abstract class BodyHttpServlet extends BaseHttpServlet implements CartePl
     messages = new PackageMessages( this.getClass() );
   }
 
+  protected boolean useXML( HttpServletRequest request ) {
+    return "Y".equalsIgnoreCase( request.getParameter( "xml" ) );
+  }
+
   public void doGet( HttpServletRequest request, HttpServletResponse response ) throws IOException {
     if ( isJettyMode() && !request.getContextPath().startsWith( getContextPath() ) ) {
       return;
@@ -54,7 +59,7 @@ public abstract class BodyHttpServlet extends BaseHttpServlet implements CartePl
       logDebug( messages.getString( "Log.Execute" ) );
     }
 
-    boolean useXML = "Y".equalsIgnoreCase( request.getParameter( "xml" ) );
+    boolean useXML = useXML( request );
     PrintWriter out = new PrintWriter( response.getOutputStream() );
 
     try {
@@ -65,7 +70,10 @@ public abstract class BodyHttpServlet extends BaseHttpServlet implements CartePl
         beginHtml( response, out );
       }
 
-      generateBody( request, response, useXML );
+      WebResult result = generateBody( request, response, useXML );
+      if ( result != null ) {
+        out.println( result.getXML() );
+      }
 
     } catch ( Exception e ) {
       String st = ExceptionUtils.getFullStackTrace( e );
@@ -81,7 +89,7 @@ public abstract class BodyHttpServlet extends BaseHttpServlet implements CartePl
         endHtml( out );
       }
       out.flush();
-      out.close();
+      IOUtils.closeQuietly( out );
     }
   }
 
@@ -109,7 +117,7 @@ public abstract class BodyHttpServlet extends BaseHttpServlet implements CartePl
     out.print( XMLHandler.getXMLHeader( Const.XML_ENCODING ) );
   }
 
-  abstract void generateBody( HttpServletRequest request, HttpServletResponse response, boolean useXML )
+  abstract WebResult generateBody( HttpServletRequest request, HttpServletResponse response, boolean useXML )
     throws Exception;
 
   @Override
@@ -120,5 +128,4 @@ public abstract class BodyHttpServlet extends BaseHttpServlet implements CartePl
   private String getTitle() {
     return messages.getString( "Title" );
   }
-
 }

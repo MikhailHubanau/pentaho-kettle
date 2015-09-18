@@ -116,7 +116,19 @@ public class SqlScriptParser {
           }
           break;
         case STRING:
-          if ( ch == currentStringChar ) {
+          if ( ch == '\\' && nextCh == '\\' ) {
+            /*
+             * The user is hard-coding a backslash into the string.
+             * Pass the hard-coded backslash through, and skip over the real backslash on the next loop
+             */
+            i++;
+          } else if ( ch == '\\' && nextCh == currentStringChar ) {
+            /*
+             * The user is hard-coding a quote character into the string.
+             * Pass the hard-coded quote character through, and skip over the quote on next loop
+             */
+            i++;
+          } else if ( ch == currentStringChar ) {
             mode = MODE.SQL;
           }
           break;
@@ -151,11 +163,12 @@ public class SqlScriptParser {
     for ( int i = 0; i < script.length(); i++ ) {
       char ch = script.charAt( i );
       char nextCh = i < script.length() - 1 ? script.charAt( i + 1 ) : 0;
+      char nextPlusOneCh = i < script.length() - 2 ? script.charAt( i + 2 ) : 0;
       switch ( mode ) {
         case SQL:
           switch ( ch ) {
             case '/':
-              if ( nextCh == '*' ) {
+              if ( nextCh == '*' && nextPlusOneCh != '+' ) {
                 mode = MODE.BLOCK_COMMENT;
                 i++;
                 ch = 0;
@@ -192,7 +205,16 @@ public class SqlScriptParser {
           }
           break;
         case STRING:
-          if ( ch == currentStringChar ) {
+          if ( ch == '\\' && nextCh == currentStringChar ) {
+            /*
+             * The user is hard-coding a quote character into the string.
+             * Pass the hard-coded quote character through, and skip over the quote on next loop
+             */
+            result.append( ch );
+            result.append( nextCh );
+            ch = 0;
+            i++;
+          } else if ( ch == currentStringChar ) {
             mode = MODE.SQL;
           }
           break;
